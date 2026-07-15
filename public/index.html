@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Recuperação | Página inicial</title>
+
+  <link rel="stylesheet" href="./css/estilo.css">
+  <link rel="icon" href="">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+
+  <!-- <script src="./js/alerta.js"></script> -->
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- scripts do Chart.js - 2022-1 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!--FONT AWESOME-->
+  <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+
+<body onload="selecionarLivrosTodos()">
+
+  <div class="janela">
+    <div class="header-left">
+      <h1>Livraria SPTech</h1>
+
+      <div class="hello">
+        <h3>Olá, usuário!</h3>
+      </div>
+
+      <div class="botoes-nav">
+
+        <div class="btn-nav">
+          <h3>Acervo</h3>
+        </div>
+
+        <div class="btn-nav-white">
+          <a href="./cadastrar-livro.html">
+            <h3>Cadastrar livro</h3>
+          </a>
+        </div>
+
+        <div class="btn-nav-white">
+          <a href="./cadastrar-autor.html">
+            <h3>Cadastrar autor</h3>
+          </a>
+        </div>
+
+        <div class="btn-nav-white">
+          <a href="./cadastrar-genero.html">
+            <h3>Cadastrar gênero</h3>
+          </a>
+        </div>
+
+        <div class="btn-nav-white">
+          <a href="./painel.html">
+            <h3>Painel</h3>
+          </a>
+        </div>
+
+
+      </div>
+
+
+
+      <div class="btn-logout">
+        <h3>Sair</h3>
+      </div>
+
+    </div>
+
+    <div class="content-right">
+      <div class="conteudo">
+        <div class="container">
+          <h1>Acervo de Livros</h1>
+          <div class="div-results">
+            <div id="feed_container" class="feed-container">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
+
+<script>
+
+  function selecionarLivrosTodos() {
+    fetch("/livros/listar").then(function (resposta) {
+      if (resposta.ok) {
+        if (resposta.status == 204) {
+          var feed = document.getElementById("feed_container");
+          var mensagem = document.createElement("span");
+          mensagem.innerHTML = "Nenhum resultado encontrado."
+          feed.appendChild(mensagem);
+          throw "Nenhum resultado encontrado!!";
+        }
+
+        resposta.json().then(function (resposta) {
+          console.log("Dados recebidos: ", JSON.stringify(resposta));
+
+          var feed = document.getElementById("feed_container");
+          feed.innerHTML = "";
+          for (let i = 0; i < resposta.length; i++) {
+            var item = resposta[i];
+
+            var divitem = document.createElement("div");
+            var spanID = document.createElement("span");
+            var spanTitulo = document.createElement("span");
+            var spanPrecoCompra = document.createElement("span");
+            var spanPrecoVenda = document.createElement("span");
+            var spanAutor = document.createElement("span");
+            var spanGenero = document.createElement("span");
+            
+            var divButtons = document.createElement("div");
+            var btnEditar = document.createElement("button");
+            var btnDeletar = document.createElement("button");
+
+            spanID.innerHTML = "ID: <b>" + item.id + "</b>";
+            spanTitulo.innerHTML = "Título: <b>" + item.titulo + "</b>";
+            spanPrecoCompra.innerHTML = "Preço de Compra (R$): <b>" + item.precoCompra + "<b>";
+            spanPrecoVenda.innerHTML = "Preço de Venda (R$): <b>" + item.precoVenda + "<b>";
+            spanAutor.innerHTML = "Autor do Livro: <b>" + item.nomeAutor + "<b>";
+            spanGenero.innerHTML = "Gênero: <b>" + item.nomeGenero + "<b>";
+
+            btnEditar.innerHTML = "Editar";
+            btnDeletar.innerHTML = "Deletar";
+
+            divitem.className = "publicacao";
+            spanTitulo.id = "inputNumero" + item.idLivro;
+            spanTitulo.className = "publicacao-titulo";
+            spanAutor.className = "publicacao-autor";
+            spanPrecoCompra.className = "publicacao-precoCompra";
+            spanPrecoVenda.className = "publicacao-precoVenda";
+            spanGenero.className = "publicacao-genero";
+
+            divButtons.className = "div-buttons"
+
+            btnEditar.className = "publicacao-btn-editar"
+            btnEditar.id = "btnEditar" + item.idLivro;
+            btnEditar.setAttribute("onclick", `editar(${item.idLivro})`);
+
+            btnDeletar.className = "publicacao-btn-editar"
+            btnDeletar.id = "btnDeletar" + item.idLivro;
+            btnDeletar.setAttribute("onclick", `deletar(${item.idLivro})`);
+
+            divitem.appendChild(spanID);
+            divitem.appendChild(spanTitulo);
+            divitem.appendChild(spanGenero);
+            divitem.appendChild(spanAutor);
+            divitem.appendChild(spanPrecoCompra);
+            divitem.appendChild(spanPrecoVenda);
+            divitem.appendChild(divButtons);
+            divButtons.appendChild(btnEditar);
+            divButtons.appendChild(btnDeletar);
+            feed.appendChild(divitem);
+          }
+
+
+        });
+      } else {
+        throw ('Houve um erro na API!');
+      }
+    }).catch(function (resposta) {
+      console.error(resposta);
+
+    });
+  }
+
+
+</script>

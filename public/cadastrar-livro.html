@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="." type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Recuperação | Mural</title>
+
+
+    <link rel="stylesheet" href="./css/estilo.css" />
+
+    <script src="./js/alerta.js"></script>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body onload="listarParaDropbown()">
+
+    <div class="janela">
+
+
+        <div class="header-left">
+            <h1>Livraria SPTech</h1>
+
+            <div class="hello">
+                <h3>Olá, usuário!</h3>
+            </div>
+
+            <div class="botoes-nav">
+
+                <div class="btn-nav-white">
+                    <a href="/">
+                        <h3>Acervo</h3>
+                    </a>
+                </div>
+
+                <div class="btn-nav">
+                    <h3>Cadastrar livro</h3>
+                </div>
+
+                <div class="btn-nav-white">
+                    <a href="./cadastrar-autor.html">
+                        <h3>Cadastrar autor</h3>
+                    </a>
+                </div>
+
+
+                <div class="btn-nav-white">
+                    <a href="./cadastrar-genero.html">
+                        <h3>Cadastrar gênero</h3>
+                    </a>
+                </div>
+
+
+                <div class="btn-nav-white">
+                    <a href="./painel.html">
+                        <h3>Painel</h3>
+                    </a>
+                </div>
+
+
+            </div>
+
+
+
+            <div class="btn-logout">
+                <h3>Sair</h3>
+            </div>
+
+        </div>
+
+        <div class="content-right">
+
+
+            <div class="conteudo">
+                <div class="container">
+                    <h1>Cadastrar um livro</h1>
+                    <div class="div-form">
+                        <form id="form_postagem" method="post" onsubmit="return cadastrar()">
+                            <label>
+                                Título:
+                                <br>
+                                <input name="titulo" id="titulo" maxlength="100" type="text">
+                            </label>
+
+                            <label for="genero">Selecione um gênero:
+                                <br>
+                                <select name="genero" id="fkGenero_lista">
+                                    <option hidden selected> - Escolha uma opção - </option>
+                                </select>
+                            </label>
+
+                            <label for="autor">Selecione um autor:
+                                <br>
+                                <select name="autor" id="fkAutor_lista">
+                                    <option hidden selected> - Escolha uma opção - </option>
+                                </select>
+                            </label>
+
+                            <label>
+                                Preço de Compra (R$):
+                                <br>
+                                <input name="precoCompra" id="precoCompra" maxlength="20" type="Text"></input>
+                            </label>
+
+                            <label>
+                                Preço de Venda (R$):
+                                <br>
+                                <input name="precoVenda" id="precoVenda" maxlength="20" type="Text"></input>
+                            </label>
+                              <label>
+                                Quantidade de livros:
+                                <br>
+                                <input name="qtd_livros" id="livros" maxlength="20" type="text"></input>
+                            </label>
+
+
+                            <button>Cadastrar</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</body>
+
+</html>
+
+<script>
+
+
+
+    function limparFormulario() {
+        document.getElementById("form_postagem").reset();
+    }
+
+    function cadastrar() {
+        var corpo = {
+            titulo: form_postagem.titulo.value,
+            fkGenero: form_postagem.fkGenero_lista.value,
+            fkAutor: form_postagem.fkAutor_lista.value,
+            precoCompra: form_postagem.precoCompra.value,
+            precoVenda: form_postagem.precoVenda.value
+        }
+
+        fetch(`/livros/cadastrar`, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(corpo)
+        }).then(function (resposta) {
+
+            console.log("resposta: ", resposta);
+
+            if (resposta.ok) {
+                window.alert("Post realizado com sucesso. Você será redirecionado ao Acervo.");
+                window.location = "/";
+                limparFormulario();
+
+            } else if (resposta.status == 404) {
+                window.alert("Deu 404!");
+            } else {
+                throw ("Houve um erro ao tentar realizar a postagem! Código da resposta: " + resposta.status);
+            }
+        }).catch(function (resposta) {
+            console.log(`#ERRO: ${resposta}`);
+
+        });
+
+        return false;
+
+    }
+
+
+    function listarParaDropbown() {
+        listarAutores()
+        listarGeneros()
+    }
+
+    function listarAutores() {
+        fetch("/autores/listar").then(function (resposta) {
+            if (resposta.ok) {
+                if (resposta.status == 204) {
+                    var lista = document.getElementById("fkAutor_lista");
+                    var fkAutor_item_lista = document.createElement("option");
+                    fkAutor_item_lista.innerHTML = "Nenhuma opção encontrada. Cadastre um autor na aba lateral."
+                    fkAutor_item_lista.value = "0"
+                    fkAutor_item_lista.disabled = true
+
+
+                    fkAutor_lista.appendChild(fkAutor_item_lista);
+                    throw "Nenhum resultado encontrado";
+                }
+
+                resposta.json().then(function (resposta) {
+                    console.log("Dados recebidos: ", JSON.stringify(resposta));
+
+                    for (let i = 0; i < resposta.length; i++) {
+                        var item = resposta[i];
+
+                        var fkAutor_item_lista = document.createElement("option");
+                        fkAutor_item_lista.innerHTML = item.nome
+                        fkAutor_item_lista.value = item.id
+                        fkAutor_lista.appendChild(fkAutor_item_lista);
+                    }
+
+
+                });
+            } else {
+                throw ('Houve um erro na API!');
+            }
+        }).catch(function (resposta) {
+            console.error(resposta);
+
+        });
+    }
+
+    function listarGeneros() {
+        fetch("/generos/listar").then(function (resposta) {
+            if (resposta.ok) {
+                if (resposta.status == 204) {
+                    var lista = document.getElementById("fkGenero_lista");
+                    var fkGenero_item_lista = document.createElement("option");
+                    fkGenero_item_lista.innerHTML = "Nenhuma opção encontrada. Cadastre um gênero na aba lateral."
+                    fkGenero_item_lista.value = "0"
+                    fkGenero_item_lista.disabled = true
+                    fkGenero_item_lista.selected = true
+                    fkGenero_lista.appendChild(fkGenero_item_lista);
+                    throw "Nenhum resultado encontrado";
+                }
+
+                resposta.json().then(function (resposta) {
+                    console.log("Dados recebidos: ", JSON.stringify(resposta));
+
+                    for (let i = 0; i < resposta.length; i++) {
+                        var item = resposta[i];
+
+                        var fkGenero_item_lista = document.createElement("option");
+                        fkGenero_item_lista.innerHTML = item.nome
+                        fkGenero_item_lista.value = item.id
+                        fkGenero_lista.appendChild(fkGenero_item_lista);
+                    }
+
+
+                });
+            } else {
+                throw ('Houve um erro na API!');
+            }
+        }).catch(function (resposta) {
+            console.error(resposta);
+
+        });
+    }
+
+
+       
+</script>
