@@ -36,3 +36,51 @@ INSERT INTO genero (nome) VALUE
        ('fantasia'),
        ('poesia'),
        ('horror');
+
+       SELECT 
+    l.id,
+    l.titulo,
+    a.nome AS autor,
+    g.nome AS genero,
+    l.precoCompra,
+    l.precoVenda AS precoVendaOriginal,
+    CASE 
+        WHEN l.precoCompra >= 100 AND g.nome IN ('horror', 'romance') 
+        THEN ROUND(l.precoCompra * 0.225 ,2)
+        ELSE l.precoVenda 
+    END AS precoVendaCalculado
+FROM livro l
+JOIN genero g ON l.fkGenero = g.id
+JOIN autor a ON l.fkAutor = a.id;
+
+SELECT 
+    l.id,
+    l.titulo,
+    a.nome AS autor,
+    g.nome AS genero,
+    l.precoCompra,
+    l.precoVenda AS precoVendaOriginal,
+    CASE 
+        WHEN l.precoCompra <= 50 AND g.nome IN ('poesia', 'horror') 
+        THEN ROUND(l.precoCompra * 0.25, 2)
+        ELSE l.precoVenda 
+    END AS precoVendaCalculado
+FROM livro l
+JOIN genero g ON l.fkGenero = g.id
+JOIN autor a ON l.fkAutor = a.id;
+
+SELECT 
+    l.id,
+    l.titulo,
+    a.nome AS autor,
+    g.nome AS genero,
+    l.precoCompra,
+    l.precoVenda AS precoVendaOriginal,
+    CASE 
+        WHEN (l.precoCompra > 50 AND l.precoCompra < 100) AND g.nome IN ('fantasia') 
+        THEN ROUND(l.precoCompra * 0.275, 2)
+        ELSE l.precoVenda 
+    END AS precoVendaCalculado
+FROM livro l
+JOIN genero g ON l.fkGenero = g.id
+JOIN autor a ON l.fkAutor = a.id;
