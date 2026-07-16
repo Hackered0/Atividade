@@ -106,19 +106,20 @@
                             <label>
                                 Preço de Compra (R$):
                                 <br>
-                                <input name="precoCompra" id="precoCompra" maxlength="20" type="Text"></input>
+                                <input name="ipt_precoCompra" id="precoCompra" maxlength="20" type="Text" oninput="calculaVenda()"></input>
                             </label>
 
                             <label>
                                 Preço de Venda (R$):
                                 <br>
-                                <input name="precoVenda" id="precoVenda" maxlength="20" type="Text"></input>
+                                <input name="ipt_precoVenda" id="precoVenda" maxlength="20" type="Text"></input>
                             </label>
                               <label>
                                 Quantidade de livros:
                                 <br>
-                                <input name="qtd_livros" id="livros" maxlength="20" type="text"></input>
+                                <input name="estoque" id="estoque" maxlength="20" type="text"></input>
                             </label>
+                            
 
 
                             <button>Cadastrar</button>
@@ -140,19 +141,39 @@
 <script>
 
 
-
+    
     function limparFormulario() {
         document.getElementById("form_postagem").reset();
     }
+    
+    function calculaVenda(){
 
+        let compra = Number(precoCompra.value);
+        let genero = fkGenero_lista.value;
+        let contador = 0;
+        
+
+        if (compra >= 100 && (genero === "4" || genero === "1")) {
+            contador = 0.225;
+        } else if(compra >= 50 && (genero === "3" || genero === "4")) {
+            contador = 0.25;
+        }else if(compra >= 50 && precoCompra <=100 && (genero === "2")){
+            contador =0.275;
+        }
+         let venda = compra * (1 + contador);
+         document.getElementById("precoVenda").value = venda.toFixed(2);
+    }
     function cadastrar() {
         var corpo = {
             titulo: form_postagem.titulo.value,
             fkGenero: form_postagem.fkGenero_lista.value,
             fkAutor: form_postagem.fkAutor_lista.value,
             precoCompra: form_postagem.precoCompra.value,
-            precoVenda: form_postagem.precoVenda.value
+            precoVenda: form_postagem.precoVenda.value,
+            estoque: form_postagem.estoque.value
         }
+        
+      
 
         fetch(`/livros/cadastrar`, {
             method: "post",
@@ -252,7 +273,8 @@
                         fkGenero_item_lista.value = item.id
                         fkGenero_lista.appendChild(fkGenero_item_lista);
                     }
-
+                 
+                  
 
                 });
             } else {
@@ -263,7 +285,7 @@
 
         });
     }
-
-
+ 
+     
        
 </script>

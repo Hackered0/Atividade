@@ -23,13 +23,10 @@ CREATE TABLE livro (
     fkGenero INT,
     precoCompra DOUBLE,
     precoVenda DOUBLE,
+    estoque DOUBLE,
     CONSTRAINT fk_livro_autor FOREIGN KEY (fkAutor) REFERENCES autor(id),
     CONSTRAINT fk_livro_genero FOREIGN KEY (fkGenero) REFERENCES genero(id)
 );
-CREATE TABLE estoque(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-    livros DOUBLE
-    );
 
 INSERT INTO genero (nome) VALUE
        ('romance'),
@@ -37,7 +34,7 @@ INSERT INTO genero (nome) VALUE
        ('poesia'),
        ('horror');
 
-       SELECT 
+   /*    SELECT 
     l.id,
     l.titulo,
     a.nome AS autor,
@@ -84,3 +81,26 @@ SELECT
 FROM livro l
 JOIN genero g ON l.fkGenero = g.id
 JOIN autor a ON l.fkAutor = a.id;
+*/
+-- primeira kpi
+SELECT g.nome, 
+    SUM(livro.estoque) 
+FROM livro AS livro 
+JOIN genero AS g ON g.id = livro.fkGenero
+GROUP BY g.nome;
+
+-- Quantidade de livro por quantidade 
+SELECT g.nome, 
+    COUNT(livro.id) 
+FROM livro AS livro 
+JOIN genero AS g ON g.id = livro.fkGenero
+GROUP BY g.nome;
+
+-- Autores caros
+SELECT 
+autor.nome,
+    SUM(livro.precoCompra) AS total_gasto
+FROM livro AS livro 
+JOIN autor AS autor ON autor.id = livro.fkAutor
+GROUP BY autor.nome
+ORDER BY total_gasto DESC;
